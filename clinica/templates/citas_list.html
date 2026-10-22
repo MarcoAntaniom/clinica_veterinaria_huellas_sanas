@@ -1,0 +1,107 @@
+
+{% extends "base.html" %}
+
+{% block title %}Citas médicas | Huellas Sanas{% endblock %}
+{% block nav_citas %}active{% endblock %}
+{% block page_heading %}Gestión de citas{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1">Citas médicas</h1>
+        <p class="text-secondary mb-0">Consulta y organiza las atenciones.</p>
+    </div>
+    <a href="{% url 'cita_create' %}" class="btn btn-success">
+        <i class="bi bi-plus-lg me-2"></i> Agendar cita
+    </a>
+</div>
+
+<div class="surface p-3 p-lg-4 mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-12 col-md-4">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" id="fecha" name="fecha"
+                   value="{{ fecha_filtro }}" class="form-control">
+        </div>
+
+        <div class="col-12 col-md-4">
+            <label for="estado" class="form-label">Estado de la cita</label>
+            <select id="estado" name="estado" class="form-select">
+                <option value="">Todos los estados</option>
+                {% for estado in estados %}
+                    <option value="{{ estado.nombre }}"
+                        {% if estado_filtro == estado.nombre %}selected{% endif %}>
+                        {{ estado.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12 col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-success flex-grow-1">
+                <i class="bi bi-search me-1"></i> Filtrar
+            </button>
+            <a href="{% url 'citas_list' %}"
+               class="btn btn-outline-secondary">Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<div class="surface p-3 p-lg-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 fw-bold mb-0">Registro de citas</h2>
+        <span class="text-secondary small">{{ citas|length }} resultado(s)</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Mascota</th>
+                    <th>Dueño</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas %}
+                <tr>
+                    <td class="text-nowrap">{{ cita.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ cita.hora|time:"H:i" }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ cita.mascota.nombre }}</div>
+                        <small class="text-secondary">
+                            {{ cita.mascota.especie.nombre }} ·
+                            {{ cita.mascota.raza.nombre }}
+                        </small>
+                    </td>
+                    <td>{{ cita.mascota.nombre_duenio }}</td>
+                    <td>{{ cita.motivo_consulta|truncatechars:45 }}</td>
+                    <td>
+                        {% if cita.estado.nombre == "Pendiente" %}
+                            <span class="badge text-bg-warning">Pendiente</span>
+                        {% elif cita.estado.nombre == "Atendida" %}
+                            <span class="badge text-bg-success">Atendida</span>
+                        {% else %}
+                            <span class="badge text-bg-danger">Cancelada</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <i class="bi bi-search fs-2 text-secondary"></i>
+                        <p class="fw-semibold mt-2 mb-1">No encontramos citas</p>
+                        <p class="text-secondary small mb-0">
+                            Prueba con otros filtros o agenda una cita nueva.
+                        </p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+
+{% extends "base.html" %}
+
+{% block title %}Panel principal | Huellas Sanas{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block page_heading %}Panel principal{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1">¡Bienvenido al equipo!</h1>
+        <p class="text-secondary mb-0">
+            Aquí tienes el resumen de la clínica.
+        </p>
+    </div>
+    <a href="{% url 'cita_create' %}" class="btn btn-success px-3 py-2">
+        <i class="bi bi-plus-lg me-2"></i>Nueva cita
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="text-secondary">Citas de hoy</span>
+                <span class="stat-icon"><i class="bi bi-calendar-event"></i></span>
+            </div>
+            <div class="display-6 fw-bold">{{ total_hoy }}</div>
+            <small class="text-secondary">Agenda diaria</small>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="text-secondary">Pendientes</span>
+                <span class="stat-icon"><i class="bi bi-clock-history"></i></span>
+            </div>
+            <div class="display-6 fw-bold">{{ pendientes }}</div>
+            <small class="text-secondary">Por atender</small>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="text-secondary">Atendidas</span>
+                <span class="stat-icon"><i class="bi bi-check-circle"></i></span>
+            </div>
+            <div class="display-6 fw-bold">{{ atendidas }}</div>
+            <small class="text-secondary">Consultas realizadas</small>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="text-secondary">Mascotas</span>
+                <span class="stat-icon"><i class="bi bi-heart"></i></span>
+            </div>
+            <div class="display-6 fw-bold">{{ total_mascotas }}</div>
+            <small class="text-secondary">Pacientes registrados</small>
+        </div>
+    </div>
+</div>
+
+<div class="surface p-3 p-lg-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h2 class="h5 fw-bold mb-1">Agenda de hoy</h2>
+            <p class="text-secondary small mb-0">
+                Citas ordenadas por hora.
+            </p>
+        </div>
+        <a href="{% url 'citas_list' %}"
+           class="btn btn-outline-success btn-sm">Ver todas</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Mascota</th>
+                    <th>Dueño</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas_hoy %}
+                <tr>
+                    <td class="fw-semibold">{{ cita.hora|time:"H:i" }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ cita.mascota.nombre }}</div>
+                        <small class="text-secondary">
+                            {{ cita.mascota.especie.nombre }}
+                        </small>
+                    </td>
+                    <td>{{ cita.mascota.nombre_duenio }}</td>
+                    <td>{{ cita.motivo_consulta|truncatechars:45 }}</td>
+                    <td>
+                        {% if cita.estado.nombre == "Pendiente" %}
+                            <span class="badge text-bg-warning">Pendiente</span>
+                        {% elif cita.estado.nombre == "Atendida" %}
+                            <span class="badge text-bg-success">Atendida</span>
+                        {% else %}
+                            <span class="badge text-bg-danger">Cancelada</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <i class="bi bi-calendar2-x fs-1 text-secondary"></i>
+                        <p class="mt-2 mb-1 fw-semibold">No hay citas para hoy</p>
+                        <p class="text-secondary small">Puedes registrar una nueva cita.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
